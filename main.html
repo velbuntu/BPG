@@ -109,11 +109,11 @@
                 <h2>Chart Settings</h2>
                 <div class="input-group">
                     <label for="title">Chart Title:</label>
-                    <input type="text" id="title" value="Views Comparison">
+                    <input type="text" id="title" placeholder="e.g., Views Comparison">
                 </div>
                 <div class="input-group">
                     <label for="x-axis">X-Axis Label (Values):</label>
-                    <input type="text" id="x-axis" value="Number of Views">
+                    <input type="text" id="x-axis" placeholder="e.g., Number of Views">
                 </div>
             </div>
 
@@ -151,29 +151,29 @@
                 </div>
                 <div class="input-group">
                     <label>Name (Category):</label>
-                    <input type="text" class="box-name" value="${name}">
+                    <input type="text" class="box-name" value="${name}" placeholder="e.g., @username">
                 </div>
                 <br>
                 <div class="summary-inputs">
                     <div class="input-group">
                         <label>Minimum:</label>
-                        <input type="number" class="box-min" value="${min}">
+                        <input type="number" class="box-min" value="${min}" placeholder="e.g., 942">
                     </div>
                     <div class="input-group">
                         <label>Q1:</label>
-                        <input type="number" class="box-q1" value="${q1}">
+                        <input type="number" class="box-q1" value="${q1}" placeholder="e.g., 1494">
                     </div>
                     <div class="input-group">
                         <label>Median:</label>
-                        <input type="number" class="box-median" value="${median}">
+                        <input type="number" class="box-median" value="${median}" placeholder="e.g., 2021">
                     </div>
                     <div class="input-group">
                         <label>Q3:</label>
-                        <input type="number" class="box-q3" value="${q3}">
+                        <input type="number" class="box-q3" value="${q3}" placeholder="e.g., 3399">
                     </div>
                     <div class="input-group">
                         <label>Maximum:</label>
-                        <input type="number" class="box-max" value="${max}">
+                        <input type="number" class="box-max" value="${max}" placeholder="e.g., 8504">
                     </div>
                 </div>
             `;
@@ -207,21 +207,25 @@
             };
 
             boxEntries.forEach(entry => {
-                const name = entry.querySelector('.box-name').value || 'Untitled';
+                const name = entry.querySelector('.box-name').value || `Untitled #${data.y.length + 1}`;
                 const min = parseFloat(entry.querySelector('.box-min').value);
                 const q1 = parseFloat(entry.querySelector('.box-q1').value);
                 const median = parseFloat(entry.querySelector('.box-median').value);
                 const q3 = parseFloat(entry.querySelector('.box-q3').value);
                 const max = parseFloat(entry.querySelector('.box-max').value);
                 
-                data.y.push(name);
-                data.q1.push(q1);
-                data.median.push(median);
-                data.q3.push(q3);
-                data.lowerfence.push(min);
-                data.upperfence.push(max);
+                // Only add the box if all values are valid numbers
+                if (![min, q1, median, q3, max].some(isNaN)) {
+                    data.y.push(name);
+                    data.q1.push(q1);
+                    data.median.push(median);
+                    data.q3.push(q3);
+                    data.lowerfence.push(min);
+                    data.upperfence.push(max);
+                }
             });
 
+            // Reverse the order of data to have the first entry at the top of the plot
             for (let key in data) {
                 if (Array.isArray(data[key])) {
                     data[key].reverse();
@@ -251,19 +255,19 @@
         }
 
         function downloadPlot() {
+            const titleValue = document.getElementById('title').value.replace(/ /g, '_');
+            const filename = titleValue || 'box-plot';
             Plotly.downloadImage('plot', {
                 format: 'png',
                 width: 1000,
                 height: 600,
-                filename: document.getElementById('title').value.replace(/ /g, '_') || 'box-plot'
+                filename: filename
             });
         }
 
-        // Add initial boxes on page load and draw the first plot
+        // Add an initial empty box on page load and draw the plot
         document.addEventListener('DOMContentLoaded', () => {
-            // Add default boxes based on the example image
-            addBox('@juliaperle', 942, 1494, 2021, 3399, 8504);
-            addBox('@emma.menziess', 1653, 3007, 4782, 10100, 105600);
+            addBox();
             updatePlot();
         });
     </script>
