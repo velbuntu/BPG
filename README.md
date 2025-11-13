@@ -5,3 +5,5 @@ How to use:
 1. Download main.html
 2. Open main.html using your browser
 3. Use it
+
+Also available on https://vel-con.neocities.org/math
